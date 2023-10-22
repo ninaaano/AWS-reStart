@@ -1,0 +1,48 @@
+import json
+import boto3
+from decimal import Decimal 
+
+def calc(Student):
+    Total = Student["Kor"] + Student["Eng"] + Student["Math"]
+    Avg = Total / 3
+    Grade = None
+    if 90 <= Avg <= 100 : Grade = 'A'
+    elif 80 <= Avg < 90 : Grade = 'B'
+    elif 70 <= Avg < 80 : Grade = 'C'
+    elif 60 <= Avg < 70 : Grade = 'D'
+    else : Grade = 'F'
+    Student["Total"] = Total 
+    Student["Avg"] = round(Avg, 2)
+    Student["Grade"] = Grade 
+    
+def insert(Student):
+    resource = boto3.resource('dynamodb', region_name='ap-northeast-2', 
+                                aws_access_key_id = '',
+                                aws_secret_access_key = '')
+    table = resource.Table('SungjukMgmt')
+    item = {
+        'Hakbun':Student['Hakbun'], 'Name':Student['Name'], 'Kor':Student['Kor'],
+        'Eng':Student['Eng'], 'Math':Student['Math'], 'Total':Student['Total'],
+        'Avg':Decimal(str(Student['Avg'])), 'Grade':Student['Grade']
+    }
+    table.put_item(Item=item)
+    return True 
+    
+def lambda_handler(event, context):
+    Student = {}
+    Student['Hakbun'] = event['Hakbun']
+    Student['Name'] = event['Name']
+    Student['Kor'] = int(event['Kor'])
+    Student['Eng'] = int(event['Eng'])
+    Student['Math'] = int(event['Math'])
+    calc(Student)
+    
+    if insert(Student) : 
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Hello from Lambda!')
+        }
+    else : 
+        return {
+            'statusCode': 500
+        }

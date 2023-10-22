@@ -1,0 +1,10 @@
+Docker Engine 설치하기
+$ sudo yum update -y
+$ sudo amazon-linux-extras install docker
+$ sudo service docker start
+$ sudo setfacl -m user:ec2-user:rw /var/run/docker.sock
+$ docker version
+
+
+Docker 실습을 위한 Github 주소
+- https://github.com/bjpublic/core_kubernetes
