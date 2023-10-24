@@ -1,0 +1,50 @@
+import json
+import pymysql
+
+def mycalc(student) : 
+    total = student['Kor'] + student['Eng'] + student['Math']
+    avg = total / 3
+    grade = None
+    if 90 <= avg <= 100 : grade = 'A'
+    elif 80 <= avg < 90 : grade = 'B'
+    elif 70 <= avg < 80 : grade = 'C'
+    elif 60 <= avg < 70 : grade = 'D'
+    else : grade = 'F'
+    student['Total'] = total
+    student['Avg'] = avg
+    student['Grade'] = grade 
+    
+    
+def myinsert(student) : 
+    dbconn = pymysql.connect(host='lab-rds-db.cxlhah81ocl3.ap-northeast-2.rds.amazonaws.com',
+        port=3306, user='admin', password='pythonmysql', database='mycompany', autocommit=True)
+    cursor = dbconn.cursor()
+    sql = f"""INSERT INTO SungjukMgmt VALUES('{student["Hakbun"]}', '{student["Name"]}', 
+            {student["Kor"]}, {student["Eng"]}, {student["Math"]}, 
+            {student["Total"]}, {student["Avg"]:.2}, '{student["Grade"]}')
+            """
+    cursor.execute(sql)
+    #print(sql)
+    cursor.close()
+    dbconn.close()
+    
+    
+def lambda_handler(event, context):
+    student = {}
+    student['Hakbun'] = event['Hakbun']
+    student['Name'] = event['Name']
+    student['Kor'] = int(event['Kor'])
+    student['Eng'] = int(event['Eng'])
+    student['Math'] = int(event['Math'])
+    mycalc(student)
+    try : 
+        myinsert(student)
+    except Exception as err :
+        print('Error Message = ', err)
+    else : 
+        print('AWS RDS Insert Successfully.')
+    # TODO implement
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
