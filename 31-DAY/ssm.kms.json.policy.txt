@@ -1,0 +1,25 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "AllowSSMGetParameter",
+			"Effect": "Allow",
+			"Action": [
+				"ssm:GetParameter"
+			],
+			"Resource": [
+				"arn:aws:ssm:ap-northeast-2:789534828835:parameter/*"
+			]
+		},
+		{
+			"Sid": "AllowDecryptSSM",
+			"Effect": "Allow",
+			"Action": [
+				"kms:Decrypt"
+			],
+			"Resource": [
+				"arn:aws:kms:ap-northeast-2:789534828835:key/420d08e6-5f64-4523-bfc9-da17a8deeba2"
+			]
+		}
+	]
+}
